@@ -1,148 +1,208 @@
-
-
 <?php 
-	class produtos{
-		public function addImagem($dados){
-			$c= new conectar();
-			$conexao=$c->conexao();
+session_start();
+if(isset($_SESSION['usuario'])){
 
-			$data=date('Y-m-d');
+	?>
 
-			$sql="INSERT into imagens (id_categoria,
-										nome,
-										url,
-										dataUpload)
-							values ('$dados[0]',
-									'$dados[1]',
-									'$dados[2]',
-									'$data')";
-			$result=mysqli_query($conexao,$sql);
 
-			return mysqli_insert_id($conexao);
+	<!DOCTYPE html>
+	<html>
+	<head>
+		<title>produtos</title>
+		<?php require_once "menu.php"; ?>
+		<?php require_once "../classes/conexao.php"; 
+		$c= new conectar();
+		$conexao=$c->conexao();
+		$sql="SELECT id_categoria,nome_categoria
+		from categorias";
+		$result=mysqli_query($conexao,$sql);
+		?>
+	</head>
+	<body>
+		<div class="container">
+			<h1>Produtos</h1>
+			<div class="row">
+				<div class="col-sm-4">
+					<form id="frmProdutos" enctype="multipart/form-data">
+						<label>Categoria</label>
+						<select class="form-control input-sm" id="categoriaSelect" name="categoriaSelect">
+							<option value="A">Selecionar Categoria</option>
+							<?php while($mostrar=mysqli_fetch_row($result)): ?>
+								<option value="<?php echo $mostrar[0] ?>"><?php echo $mostrar[1]; ?></option>
+							<?php endwhile; ?>
+						</select>
+						<label>Nome</label>
+						<input type="text" class="form-control input-sm" id="nome" name="nome">
+						<label>Descrição</label>
+						<input type="text" class="form-control input-sm" id="descricao" name="descricao">
+						<label>Quantidade</label>
+						<input type="text" class="form-control input-sm" id="quantidade" name="quantidade">
+						<label>Preço</label>
+						<input type="text" class="form-control input-sm" id="preco" name="preco">
+						<label>Imagem</label>
+						<input type="file" id="imagem" name="imagem">
+						<p></p>
+						<span id="btnAddProduto" class="btn btn-primary">Adicionar</span>
+					</form>
+				</div>
+				<div class="col-sm-8">
+					<div id="tabelaProdutosLoad"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Button trigger modal -->
+		
+		<!-- Modal -->
+		<div class="modal fade" id="abremodalUpdateProduto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+			<div class="modal-dialog modal-sm" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="myModalLabel">Editar Produto</h4>
+					</div>
+					<div class="modal-body">
+						<form id="frmProdutosU" enctype="multipart/form-data">
+							<input type="text" id="idProduto" hidden="" name="idProduto">
+							<label>Categoria</label>
+							<select class="form-control input-sm" id="categoriaSelectU" name="categoriaSelectU">
+								<option value="A">Selecionar Categoria</option>
+								<?php 
+								$sql="SELECT id_categoria,nome_categoria
+								from categorias";
+								$result=mysqli_query($conexao,$sql);
+								?>
+								<?php while($mostrar=mysqli_fetch_row($result)): ?>
+									<option value="<?php echo $mostrar[0] ?>"><?php echo $mostrar[1]; ?></option>
+								<?php endwhile; ?>
+							</select>
+							<label>Nome</label>
+							<input type="text" class="form-control input-sm" id="nomeU" name="nomeU">
+							<label>Descrição</label>
+							<input type="text" class="form-control input-sm" id="descricaoU" name="descricaoU">
+							<label>Quantidade</label>
+							<input type="text" class="form-control input-sm" id="quantidadeU" name="quantidadeU">
+							<label>Preço</label>
+							<input type="text" class="form-control input-sm" id="precoU" name="precoU">
+							
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button id="btnAtualizarProduto" type="button" class="btn btn-warning" data-dismiss="modal">Editar</button>
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</body>
+	</html>
+
+	<script type="text/javascript">
+		function addDadosProduto(idproduto){
+			$.ajax({
+				type:"POST",
+				data:"idpro=" + idproduto,
+				url:"../procedimentos/produtos/obterDados.php",
+				success:function(r){
+					
+					dado=jQuery.parseJSON(r);
+					$('#idProduto').val(dado['id_produto']);
+					$('#categoriaSelectU').val(dado['id_categoria']);
+					$('#nomeU').val(dado['nome']);
+					$('#descricaoU').val(dado['descricao']);
+					$('#quantidadeU').val(dado['quantidade']);
+					$('#precoU').val(dado['preco']);
+
+				}
+			});
 		}
-		public function inserirProduto($dados){
-			$c= new conectar();
-			$conexao=$c->conexao();
 
-			$data=date('Y-m-d');
-
-			$sql="INSERT into produtos (id_categoria,
-										id_imagem,
-										id_usuario,
-										nome,
-										descricao,
-										quantidade,
-										preco,
-										dataCaptura) 
-							values ('$dados[0]',
-									'$dados[1]',
-									'$dados[2]',
-									'$dados[3]',
-									'$dados[4]',
-									'$dados[5]',
-									'$dados[6]',
-									'$data')";
-			return mysqli_query($conexao,$sql);
-		}
-
-
-
-		public function obterDados($idproduto){
-			$c= new conectar();
-			$conexao=$c->conexao();
-
-			$sql="SELECT id_produto, 
-						id_categoria, 
-						nome,
-						descricao,
-						quantidade,
-						preco 
-				from produtos 
-				where id_produto='$idproduto'";
-			$result=mysqli_query($conexao,$sql);
-
-			$mostrar=mysqli_fetch_row($result);
-
-			$dados=array(
-					"id_produto" => $mostrar[0],
-					"id_categoria" => $mostrar[1],
-					"nome" => $mostrar[2],
-					"descricao" => $mostrar[3],
-					"quantidade" => $mostrar[4],
-					"preco" => $mostrar[5]
-						);
-
-			return $dados;
-		}
-
-
-
-		public function atualizar($dados){
-			$c= new conectar();
-			$conexao=$c->conexao();
-
-			$sql="UPDATE produtos set id_categoria='$dados[1]', 
-										nome='$dados[2]',
-										descricao='$dados[3]',
-										quantidade='$dados[4]',
-										preco='$dados[5]'
-						where id_produto='$dados[0]'";
-
-			return mysqli_query($conexao,$sql);
-		}
-
-
-
-		public function excluir($idproduto){
-			$c= new conectar();
-			$conexao=$c->conexao();
-
-			$idimagem=self::obterIdImg($idproduto);
-
-			$sql="DELETE from produtos 
-					where id_produto='$idproduto'";
-			$result=mysqli_query($conexao,$sql);
-
-			if($result){
-				$url=self::obterUrlImagem($idimagem);
-
-				$sql="DELETE from imagens 
-						where id_imagem='$idimagem'";
-				$result=mysqli_query($conexao,$sql);
-					if($result){
-						if(unlink($url)){
-							return 1;
+		function eliminarProduto(idProduto){
+			alertify.confirm('Deseja Excluir este Produto?', function(){ 
+				$.ajax({
+					type:"POST",
+					data:"idproduto=" + idProduto,
+					url:"../procedimentos/produtos/eliminarProdutos.php",
+					success:function(r){
+						if(r==1){
+							$('#tabelaProdutosLoad').load("produtos/tabelaProdutos.php");
+							alertify.success("Excluido com sucesso!!");
+						}else{
+							alertify.error("Não Excluido :(");
 						}
 					}
-			}
+				});
+			}, function(){ 
+				alertify.error('Cancelado !')
+			});
 		}
+	</script>
 
-		public function obterIdImg($idProduto){
-			$c= new conectar();
-			$conexao=$c->conexao();
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$('#btnAtualizarProduto').click(function(){
 
-			$sql="SELECT id_imagem 
-					from produtos 
-					where id_produto='$idProduto'";
-			$result=mysqli_query($conexao,$sql);
+				dados=$('#frmProdutosU').serialize();
+				$.ajax({
+					type:"POST",
+					data:dados,
+					url:"../procedimentos/produtos/atualizarProdutos.php",
+					success:function(r){
+						if(r==1){
+							$('#tabelaProdutosLoad').load("produtos/tabelaProdutos.php");
+							alertify.success("Editado com sucesso!!");
+						}else{
+							alertify.error("Erro ao editar");
+						}
+					}
+				});
+			});
+		});
+	</script>
 
-			return mysqli_fetch_row($result)[0];
-		}
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$('#tabelaProdutosLoad').load("produtos/tabelaProdutos.php");
 
-		public function obterUrlImagem($idImg){
-			$c= new conectar();
-			$conexao=$c->conexao();
+			$('#btnAddProduto').click(function(){
 
-			$sql="SELECT url 
-					from imagens 
-					where id_imagem='$idImg'";
+				vazios=validarFormVazio('frmProdutos');
 
-			$result=mysqli_query($conexao,$sql);
+				if(vazios > 0){
+					alertify.alert("Preencha todos os campos!!");
+					return false;
+				}
 
-			return mysqli_fetch_row($result)[0];
-		}
+				var formData = new FormData(document.getElementById("frmProdutos"));
 
-		
-	}
+				$.ajax({
+					url: "../procedimentos/produtos/inserirProdutos.php",
+					type: "post",
+					dataType: "html",
+					data: formData,
+					cache: false,
+					contentType: false,
+					processData: false,
 
- ?>
+					success:function(r){
+						
+						if(r == 1){
+							$('#frmProdutos')[0].reset();
+							$('#tabelaProdutosLoad').load("produtos/tabelaProdutos.php");
+							alertify.success("Adicionado com sucesso!!");
+						}else{
+							alertify.error("Falha ao Adicionar");
+						}
+					}
+				});
+				
+			});
+		});
+	</script>
+
+	<?php 
+}else{
+	header("location:../index.php");
+}
+?>

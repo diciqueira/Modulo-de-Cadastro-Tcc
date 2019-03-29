@@ -10,20 +10,25 @@
 <head>
 	<title>vendas</title>
 	<?php require_once "menu.php"; ?>
+	<link rel="stylesheet" href="css/caixa.css">
 </head>
 <body>
 
 	<div class="container">
 		 <h1>Venda de Produtos</h1>
-		 <div class="row">
-		 	<div class="col-sm-12">
-		 		<span class="btn btn-default" id="vendaProdutosBtn">Vender Produto</span>
-		 		<span class="btn btn-default" id="vendasFeitasBtn">Lista de Vendas</span>
+		 
+		 	<div class="col-sm-4">
+		 		<div class="borda">
+		 		</div>	
+		 	
 		 	</div>
-		 </div>
-		 <div class="row">
-		 	<div class="col-sm-12">
-		 		<div id="vendaProdutos"></div>
+
+
+		 	
+		 
+		 
+		 	<div class="col-sm-8">
+		 		
 		 		<div id="vendasFeitas">
 
 		 			
@@ -36,7 +41,7 @@
 
 		 		</div>
 		 	</div>
-		 </div>
+		
 	</div>
 </body>
 </html>

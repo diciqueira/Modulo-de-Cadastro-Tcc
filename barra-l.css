@@ -1,0 +1,24 @@
+
+<style>
+	{
+  box-sizing: border-box;
+}
+.menu {
+  	
+    width: auto;
+    height: auto;
+  	text-align:center;
+
+}
+.menu a {
+  /*background-color:#e5e5e5;*/
+  
+ 
+  padding:2px;
+  margin-top:4px;
+  margin-left:2px: 
+  display:block;
+  width:16%;
+  color:black;
+}
+</style>
